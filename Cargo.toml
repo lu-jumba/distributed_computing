@@ -1,0 +1,14 @@
+[package]
+name = "distributed_computing"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+flate2 = "1.0"
+aws-sdk-ec2 = "0.0.22-alpha"
+redis = "0.23"
+tonic = { version = "0.7", features = ["transport"] }
+prost = "0.9"  # For protocol buffer support
+tokio = { version = "1", features = ["full"] }
+
+

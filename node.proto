@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package node;
+
+service NodeService {
+  // Check node health (heartbeat)
+  rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse);
+
+  // Assign a task to a node
+  rpc AssignTask (TaskRequest) returns (TaskResponse);
+
+  // Get node status
+  rpc GetNodeStatus (NodeStatusRequest) returns (NodeStatusResponse);
+}
+
+message HeartbeatRequest {
+  string node_id = 1;
+}
+
+message HeartbeatResponse {
+  bool healthy = 1;
+}
+
+message TaskRequest {
+  string task_id = 1;
+  uint64 required_ram = 2;
+  uint64 required_cpu = 3;
+  uint64 required_bandwidth = 4;
+  bytes data = 5;
+}
+
+message TaskResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message NodeStatusRequest {}
+
+message NodeStatusResponse {
+  string node_id = 1;
+  uint64 available_ram = 2;
+  uint64 available_cpu = 3;
+  uint64 available_bandwidth = 4;
+}
