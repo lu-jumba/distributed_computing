@@ -52,4 +52,39 @@ impl RedisClient {
         conn.get(format!("task_assignment:{}", task_id)).await.unwrap()
     }
 
+    async fn distribute_tasks(
+        redis_client: &RedisClient,
+        controller: &mut NodeController,
+        task_id: String,
+        task_ram: u64,
+        task_cpu: u64,
+        task_bandwidth: u64,
+        task_data: Vec<u8>,
+    ) {
+        // Retrieve available nodes from Redis
+        let node_ids = vec!["node_1".to_string(), "node_2".to_string()];
+        
+        for node_id in node_ids {
+            if let Some((available_ram, available_cpu, available_bandwidth)) = redis_client.get_node_status(node_id.clone()).await {
+                if available_ram >= task_ram && available_cpu >= task_cpu && available_bandwidth >= task_bandwidth {
+                    // Assign the task via gRPC
+                    let success = controller.assign_task_to_node(
+                        task_id.clone(),
+                        task_ram,
+                        task_cpu,
+                        task_bandwidth,
+                        task_data.clone(),
+                    ).await;
+    
+                    if success {
+                        // Store task assignment in Redis
+                        redis_client.assign_task_to_node(task_id.clone(), node_id.clone()).await;
+                        println!("Task {} assigned to Node {}", task_id, node_id);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
 }
